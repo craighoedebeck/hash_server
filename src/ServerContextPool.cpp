@@ -33,7 +33,7 @@ void ServerContextPool::run()
     for(auto context : m_contexts) 
     {
       std::shared_ptr<std::thread> worker_thread(
-        new std::thread([&context]{
+        new std::thread([context]{
           context->run();
         })
       );

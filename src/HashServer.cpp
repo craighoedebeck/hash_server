@@ -11,8 +11,8 @@ HashServer::HashServer(const std::string& address, std::size_t port, std::size_t
   m_signals.add(SIGQUIT);
   m_signals.async_wait(std::bind(&HashServer::handle_stop, this));
 
-  // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
-  boost::asio::ip::tcp::resolver resolver(m_acceptor.get_executor().context());
+  //Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
+  boost::asio::ip::tcp::resolver resolver(m_acceptor.get_executor());
   boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(address, std::to_string(port)).begin();
   m_acceptor.open(endpoint.protocol());
   m_acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));

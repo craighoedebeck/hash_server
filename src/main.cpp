@@ -12,7 +12,7 @@ int main(int /*argc*/, char** /*argv*/)
   {
     // Initialise the server.
     std::size_t num_threads = std::thread::hardware_concurrency();
-    HashServer s("localhost", 5000, num_threads);
+    HashServer s("localhost", 5050, num_threads);
 
     // Run the server until stopped.
     s.run();
