@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker run --network="host" hash_server ./hash_server
+docker run -p 6060:6060 hash_server ./hash_server

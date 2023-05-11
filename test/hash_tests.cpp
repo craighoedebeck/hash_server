@@ -12,8 +12,6 @@ void add_data_to_parser(const std::string data, MessageParser& parser)
     container[i] = data[i];
   }
 
-  std::cout << "Last character = " << *(container.begin() + data.size() - 1) << std::endl;
-
   parser.receive_data(container.begin(), container.begin() + data.size());
 }
 
