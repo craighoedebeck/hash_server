@@ -5,7 +5,6 @@ HashServer::HashServer(const std::string& address, std::size_t port, std::size_t
   ,m_signals(m_context_pool.get_context())
   ,m_acceptor(m_context_pool.get_context())
   ,m_new_connection()
-  ,m_request_handler()
 {
   m_signals.add(SIGINT);
   m_signals.add(SIGTERM);
@@ -30,7 +29,7 @@ void HashServer::run()
 
 void HashServer::start_accept()
 {
-  m_new_connection.reset(new HashConnection(m_context_pool.get_context(), m_request_handler));
+  m_new_connection.reset(new HashConnection(m_context_pool.get_context()));
         
   m_acceptor.async_accept(
     m_new_connection->socket(),

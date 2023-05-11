@@ -1,14 +1,11 @@
 #include "HashConnection.hpp"
-#include "HashRequestHandler.hpp"
-#include "HashAlgorithms.hpp"
 
 #include <vector>
 
-HashConnection::HashConnection(boost::asio::io_context& io_context, HashRequestHandler& handler)
+HashConnection::HashConnection(boost::asio::io_context& io_context)
   :m_socket(io_context)
-  ,m_request_handler(handler)
   ,m_buffer()
-  ,m_reply(MD5_DIGEST_LENGTH*2 + 1, '\n') //all but last newline will get overwritten by hash algo
+  ,m_parser()
 {
 }
 
@@ -42,16 +39,15 @@ void HashConnection::handle_read(
 {
   if (!e)
   {
-    auto end_of_string = std::find(m_buffer.begin(), m_buffer.end(), '\n');
+    m_parser.receive_data(m_buffer.begin(), m_buffer.begin() + bytes_transferred);
 
-    if (end_of_string != m_buffer.end())
+    //If we have a reply to send, send it, otherwise read more data
+    if(m_parser.has_reply())
     {
-      
-      MD5Hash::calculate(std::string(m_buffer.begin(), end_of_string), m_reply);
-      
+      //write my response
       boost::asio::async_write(
         m_socket,
-        boost::asio::buffer(m_reply),
+        boost::asio::buffer(m_parser.get_reply()),
         std::bind(&HashConnection::handle_write, shared_from_this(), std::placeholders::_1)
       );
     }
@@ -75,6 +71,16 @@ void HashConnection::handle_write(const boost::system::error_code& e)
     m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
   }
   else {
-    read_some();
+    //We have successfully written at this point, so clear the reply flag
+    m_parser.has_reply(false);
+
+    //If we have leftovers, call handle_read again so they get processed before
+    //we receive any more bytes
+    if(m_parser.has_leftover())
+    {
+      handle_read(e, 0);
+    } else {
+      read_some();
+    }
   }
 }

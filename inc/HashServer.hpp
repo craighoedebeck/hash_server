@@ -7,7 +7,6 @@
 
 #include "HashConnection.hpp"
 #include "ServerContextPool.hpp"
-#include "HashRequestHandler.hpp"
 
 /// The top-level class of the hash HashServer
 class HashServer
@@ -40,7 +39,4 @@ private:
 
   /// The next connection to be accepted.
   std::shared_ptr<HashConnection> m_new_connection;
-
-  /// The handler for all incoming requests.
-  HashRequestHandler m_request_handler;
 };
