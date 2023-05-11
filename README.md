@@ -4,8 +4,7 @@ Server for taking in newline terminated strings, and returning the hash of the s
 ## Building
 This was build and tested on Ubuntu 20.04.  Cmake is used to build.  If you wish to build natively do the following:
 
-cmake .
-make
+cmake . && make
 
 You will need openssl development libraries, boost, and google test in order to build.
 
