@@ -11,7 +11,9 @@ RUN apt-get update && apt-get install -y \
   build-essential \
   libboost-all-dev \
   libssl-dev \
-  libgtest-dev
+  libgtest-dev \
+  net-tools \
+  netcat
 
 RUN cmake .
 RUN make
