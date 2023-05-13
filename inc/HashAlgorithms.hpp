@@ -8,11 +8,28 @@
 
 class MD5Hash {
   public:
-    MD5Hash() { init_hasher(); }
+    MD5Hash(
+    ):m_context()
+     ,m_needs_finalization(false)
+    {
+      init_hasher();
+    }
+
+    ~MD5Hash()
+    {
+      //Unclear if this is needed.  Doesn't leak memory if this is not called.
+      //Including this here in case other resources (file handle maybe?) are obtained.
+      if(m_needs_finalization)
+      {
+        uint8_t dummy_data[MD5_DIGEST_LENGTH];
+        MD5_Final(dummy_data, &m_context);
+      }
+    }
 
     void init_hasher()
     {
       MD5_Init(&m_context);
+      m_needs_finalization = true;
     }
 
     void append_bytes(const std::string& received_bytes)
@@ -24,6 +41,7 @@ class MD5Hash {
     {
       MD5_Final(reinterpret_cast<uint8_t*>(output.data()), &m_context);
       md5_to_hex(output);
+      m_needs_finalization = false;
     }
 
   private:
@@ -43,4 +61,5 @@ class MD5Hash {
     }
 
     MD5_CTX m_context;
+    bool m_needs_finalization;
 };

@@ -6,6 +6,7 @@ COPY . .
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
+
 RUN apt-get update && apt-get install -y \
   cmake \
   build-essential \
@@ -13,6 +14,7 @@ RUN apt-get update && apt-get install -y \
   libssl-dev \
   libgtest-dev \
   net-tools \
+  valgrind \
   netcat
 
 RUN cmake .

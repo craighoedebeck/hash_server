@@ -27,6 +27,16 @@ void HashConnection::read_some()
   );
 }
 
+void HashConnection::schedule_write()
+{
+  //write my response
+  boost::asio::async_write(
+    m_socket,
+    boost::asio::buffer(m_parser.get_reply()),
+    std::bind(&HashConnection::handle_write, shared_from_this(), std::placeholders::_1)
+  );
+}
+
 
 void HashConnection::start()
 {
@@ -44,12 +54,7 @@ void HashConnection::handle_read(
     //If we have a reply to send, send it, otherwise read more data
     if(m_parser.has_reply())
     {
-      //write my response
-      boost::asio::async_write(
-        m_socket,
-        boost::asio::buffer(m_parser.get_reply()),
-        std::bind(&HashConnection::handle_write, shared_from_this(), std::placeholders::_1)
-      );
+      schedule_write();
     }
     else
     {
@@ -70,17 +75,23 @@ void HashConnection::handle_write(const boost::system::error_code& e)
     boost::system::error_code ignored_ec;
     m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
   }
-  else {
+  else
+  {
     //We have successfully written at this point, so clear the reply flag
     m_parser.has_reply(false);
 
-    //If we have leftovers, call handle_read again so they get processed before
-    //we receive any more bytes
+    //If we have leftovers, process those leftovers, and send if we have a reply
     if(m_parser.has_leftover())
     {
-      handle_read(e, 0);
-    } else {
-      read_some();
+      m_parser.process_leftovers();
+      if(m_parser.has_reply())
+      {
+        schedule_write();
+        return;
+      } 
     }
+    //Read some more if we didn't write anything this time
+    read_some();
   }
 }
+

@@ -15,7 +15,11 @@ void MessageParser::receive_data(
 {
   //Append everything to leftover
   m_leftover.append(begin, end);
+  process_leftovers();
+}
 
+void MessageParser::process_leftovers()
+{
   //find the first newline in leftover
   auto end_of_string = m_leftover.find('\n');
 
@@ -26,7 +30,6 @@ void MessageParser::receive_data(
     m_hasher.append_bytes(m_leftover.substr(0, end_of_string));
     //Make sure we erase the null terminator from leftover
     m_leftover.erase(0, end_of_string+1);
-
 
     //get the hash result
     m_hasher.finalize(m_reply);

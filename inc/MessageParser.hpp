@@ -10,6 +10,7 @@ class MessageParser
     MessageParser();
 
     void receive_data(BufferContainer::const_iterator begin, BufferContainer::const_iterator end);
+    void process_leftovers();
     inline bool has_reply() const { return m_has_reply; }
     inline void has_reply(bool reply) {m_has_reply = reply;}
     inline bool has_leftover() const { return !m_leftover.empty(); }

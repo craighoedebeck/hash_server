@@ -32,6 +32,8 @@ class HashConnection
 
     void read_some();
 
+    void schedule_write();
+
     //Socket for the HashConnection.
     boost::asio::ip::tcp::socket m_socket;
 
